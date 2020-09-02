@@ -1,0 +1,22 @@
+.profile {
+    display: flex;
+}
+
+.name {
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.photo {
+    width: 40%; 
+}
+
+.tags {
+    width: 100%;
+}
+
+.info {
+    width: 100%;
+}
