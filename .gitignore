@@ -1,15 +1,17 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+## Front (Javascript) ###
+
 # dependencies
-/node_modules
-/.pnp
+node_modules
+.pnp
 .pnp.js
 
 # testing
-/coverage
+coverage
 
 # production
-/build
+build
 
 # misc
 .DS_Store
@@ -21,3 +23,31 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+## Back (Python) ### 
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+### Vim ###
+# Swap
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+Sessionx.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
