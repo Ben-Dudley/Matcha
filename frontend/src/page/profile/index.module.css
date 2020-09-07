@@ -1,12 +1,14 @@
 .profile {
     display: flex;
+    flex-wrap: wrap;
+    flex-direction: bottom;
 }
 
 .name {
     width: 60%;
-    display: flex;
+    /* display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: center; */
 }
 
 .photo {

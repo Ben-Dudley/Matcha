@@ -10,7 +10,7 @@ class Profile extends React.Component {
         {/* TODO: запрос пользователя */}
         <div className={styles.name}>
         <header>{'Серый волк, 25'}</header>
-        <p>{'м, гей'}</p>
+        <p>{'м, гетеро'}</p>
         <p>{'ЮЗАО Москва'}</p>
         </div>
         <img className={styles.photo} src='volk.jpg' alt=""/>
