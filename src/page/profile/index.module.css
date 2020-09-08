@@ -4,8 +4,12 @@
     flex-direction: bottom;
 }
 
-.name {
+.fio {
     width: 60%;
+}
+
+.name {
+    font-size: 500%;
 }
 
 .photo {

@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -15,7 +17,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -34,8 +36,49 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^7.8.1",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-react-jsx": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
+    "babel-jest": "^24.9.0",
+    "babel-plugin-react-css-modules": "^5.2.6",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.4",
+    "eslint": "^6.6.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-react": "^7.20.6"
+    "eslint-plugin-react": "^7.20.6",
+    "jest": "^24.9.0",
+    "preset-react": "^1.0.0",
+    "react-test-renderer": "^16.13.1"
+  },
+  "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "verbose": true,
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
+      "\\.(css|less)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "clearMocks": false,
+    "testRegex": "(/tests/.*|\\.(test|spec))\\.(js|jsx)$",
+    "setupFilesAfterEnv": [
+      "<rootDir>/setupTests.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/(node_modules|.vscode)/"
+    ],
+    "collectCoverageFrom": [
+      "src/components**/*.(js,jsx)"
+    ],
+    "testEnvironment": "node"
   }
 }

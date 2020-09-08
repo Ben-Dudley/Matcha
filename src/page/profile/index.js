@@ -15,8 +15,8 @@ class Profile extends React.Component {
     return (<>
       <div className={styles.profile}>
         {/* TODO: запрос пользователя */}
-        <div className={styles.name}>
-          <header>{'Серый волк, 25'}</header>
+        <div className={styles.fio}>
+          <header className={styles.name}>{'Серый волк, 25'}</header>
           <p>{'м, гетеро'}</p>
           <p>{'ЮЗАО Москва'}</p>
         </div>
