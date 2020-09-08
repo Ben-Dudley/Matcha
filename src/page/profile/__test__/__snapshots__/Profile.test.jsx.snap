@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Profile test should snapshot 1`] = `
+Array [
+  <div
+    className="profile"
+  >
+    <div
+      className="fio"
+    >
+      <header
+        className="name"
+      >
+        Серый волк, 25
+      </header>
+      <p>
+        м, гетеро
+      </p>
+      <p>
+        ЮЗАО Москва
+      </p>
+    </div>
+    <img
+      alt=""
+      className="photo"
+      src="volk.jpg"
+    />
+  </div>,
+  <p
+    className="info"
+  >
+    Рейтинг славы: 10000000000000000
+  </p>,
+  <p
+    className="info"
+  >
+    О себе: в поисках своего зайца
+  </p>,
+  <p
+    className="tags"
+  >
+    Мультипликация, животные, кулинария
+  </p>,
+]
+`;
