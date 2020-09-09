@@ -8,6 +8,9 @@ import styles from './index.module.css';
  * Страниа профиля
 */
 class Profile extends React.Component {
+  state = {
+    enabled: false,
+  }
   /**
   * @return {obj} рендер странички с профилем
   */
@@ -24,7 +27,9 @@ class Profile extends React.Component {
       </div>
       <p className={styles.info}>{'Рейтинг славы: 10000000000000000'}</p>
       <p className={styles.info}>{'О себе: в поисках своего зайца'}</p>
-      <p className={styles.tags}>{'Мультипликация, животные, кулинария'}</p>
+      <button className={styles.button} onClick={() => {this.setState({enabled: !this.state.enabled})}}>
+        {(!this.state.enabled && 'Показать') || 'Cпрятать'}</button>
+    <> {this.state.enabled && <p className={styles.tags}>{'Мультипликация, животные, кулинария'}</p>} </>
     </>);
   }
 }

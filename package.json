@@ -50,35 +50,5 @@
     "jest": "^24.9.0",
     "preset-react": "^1.0.0",
     "react-test-renderer": "^16.13.1"
-  },
-  "jest": {
-    "moduleDirectories": [
-      "node_modules",
-      "src"
-    ],
-    "verbose": true,
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
-      "\\.(css|less)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
-    "clearMocks": false,
-    "testRegex": "(/tests/.*|\\.(test|spec))\\.(js|jsx)$",
-    "setupFilesAfterEnv": [
-      "<rootDir>/setupTests.js"
-    ],
-    "transformIgnorePatterns": [
-      "node_modules"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/(node_modules|.vscode)/"
-    ],
-    "collectCoverageFrom": [
-      "src/components**/*.(js,jsx)"
-    ],
-    "testEnvironment": "node"
   }
 }

@@ -36,10 +36,13 @@ Array [
   >
     О себе: в поисках своего зайца
   </p>,
-  <p
-    className="tags"
+  <button
+    className="button"
+    onClick={[Function]}
   >
-    Мультипликация, животные, кулинария
-  </p>,
+    Показать
+  </button>,
+  " ",
+  " ",
 ]
 `;
