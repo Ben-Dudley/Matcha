@@ -2,16 +2,11 @@ version: "3.8"
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: dockerfiles/dev/Dockerfile
-    volumes:
-      - ./backend:/home/backend
     networks:
       - backend
       - frontend
-    ports:
-      - "5000:5000"
+    depends_on:
+      - db
 
   frontend:
     build:
@@ -24,6 +19,13 @@ services:
     ports:
       - "3000:3000"
     tty: true
+
+  db:
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    restart: always
 
 networks:
   backend:
