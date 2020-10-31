@@ -9,11 +9,6 @@ services:
       - db
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: dockerfiles/dev/Dockerfile
-    volumes:
-      - ./frontend:/home/frontend
     networks:
       - frontend
     ports:
@@ -24,7 +19,9 @@ services:
     networks:
       - backend
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: matcha
     restart: always
 
 networks:

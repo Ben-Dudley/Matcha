@@ -1,14 +1,22 @@
 import os
 
 from flask import Flask
+from sqlalchemy.engine.url import URL
 
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    database = {
+        'drivername': 'postgres',
+        'username': 'admin',
+        'password': 'password',
+        'host': 'db',
+        'database': 'matcha'
+    }
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'db.sqlite'),
+        DATABASE=URL(**database)
     )
 
     if test_config is None:
@@ -30,5 +38,9 @@ def create_app(test_config=None):
         return 'Hello, World!'
 
     from . import db
+    db.init_app(app)
+
+    from . import auth
+    app.register_blueprint(auth.bp)
 
     return app
