@@ -48,7 +48,7 @@ def register():
     engine = get_engine()
 
     result = engine.execute(
-        text('SELECT user_id FROM Users WHERE username = :u'),
+        text('SELECT * FROM Users WHERE username = :u'),
         u=username
     )
     if request.method == 'POST':
