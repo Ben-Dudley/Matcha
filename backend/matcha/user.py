@@ -61,7 +61,10 @@ def register():
         )
         return 'User registered successfully', 201
     else:
-        if result.fetchone() is not None:
+        user = result.fetchone()
+        if user is not None:
+            if not check_password_hash(user['password'], password):
+                return 'Incorrect password', 400
             engine.execute(
                 text('DELETE FROM Users WHERE username = :u'),
                 u=username
