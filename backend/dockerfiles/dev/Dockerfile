@@ -5,7 +5,7 @@ ENV FLASK_ENV "development"
 
 WORKDIR /home/backend
 
-COPY requirements.txt .
+COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
