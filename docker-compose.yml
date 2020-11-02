@@ -2,28 +2,27 @@ version: "3.8"
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: dockerfiles/dev/Dockerfile
-    volumes:
-      - ./backend:/home/backend
     networks:
       - backend
       - frontend
-    ports:
-      - "5000:5000"
+    depends_on:
+      - db
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: dockerfiles/dev/Dockerfile
-    volumes:
-      - ./frontend:/home/frontend
     networks:
       - frontend
     ports:
       - "3000:3000"
     tty: true
+
+  db:
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: matcha
+    restart: always
 
 networks:
   backend:

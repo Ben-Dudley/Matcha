@@ -1,12 +1,13 @@
 FROM python:3.8.5
 
-ENV "FLASK_APP" "matcha"
-ENV "FLASK_ENV" "development"
+ENV FLASK_APP "matcha"
+ENV FLASK_ENV "development"
 
 WORKDIR /home/backend
 
-COPY requirements.txt .
+COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT flask init-db \
+            && flask run --host=0.0.0.0
