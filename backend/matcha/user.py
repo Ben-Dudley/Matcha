@@ -11,62 +11,65 @@ bp = Blueprint('user', __name__, url_prefix='/user')
 def login():
     if request.method == 'POST':
         content = request.json
-        username = content['username']
+        user_name = content['user_name']
         password = content['password']
 
-        app.logger.info(f'username - {username}')
+        app.logger.info(f'username - {user_name}')
         app.logger.info(f'password - {password}')
         engine = get_engine()
 
         user = engine.execute(
-            text('SELECT * FROM Users WHERE username = :u'),
-            u=username
+            text('SELECT * FROM Users WHERE user_name = :u'),
+            u=user_name
         ).fetchone()
 
         if user is None:
-            return 'Incorrect username', 400
+            return 'Incorrect user_name', 400
         elif not check_password_hash(user['password'], password):
             return 'Incorrect password', 400
 
         return 'Successful login', 200
+    return 405
 
 
 @bp.route('/register', methods=('POST', 'DELETE'))
 def register():
     content = request.json
-    username = content['username']
+    user_name = content['user_name']
     password = content['password']
 
-    app.logger.info(f'username - {username}')
+    app.logger.info(f'user_name - {user_name}')
     app.logger.info(f'password - {password}')
 
-    if not username:
-        return 'Username is required', 400
+    if not user_name:
+        return 'user_name is required', 400
     elif not password:
-        return 'Password is required', 400
+        return 'password is required', 400
 
     engine = get_engine()
 
     result = engine.execute(
-        text('SELECT * FROM Users WHERE username = :u'),
-        u=username
+        text('SELECT * FROM Users WHERE user_name = :u'),
+        u=user_name
     )
     if request.method == 'POST':
         if result.fetchone() is not None:
             return 'User is already registered', 400
 
         engine.execute(
-            text('INSERT INTO Users (username, password) VALUES (:u, :p)'),
-            u=username, p=generate_password_hash(password)
+            text('INSERT INTO Users (user_name, password) VALUES (:u, :p)'),
+            u=user_name, p=generate_password_hash(password)
         )
         return 'User registered successfully', 201
-    else:
+    elif request.method == 'DELETE':
         user = result.fetchone()
         if user is not None:
             if not check_password_hash(user['password'], password):
                 return 'Incorrect password', 400
             engine.execute(
-                text('DELETE FROM Users WHERE username = :u'),
-                u=username
+                text('DELETE FROM Users WHERE user_name = :u'),
+                u=user_name
             )
         return 'User does not exist', 200
+    return 405
+
