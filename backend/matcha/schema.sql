@@ -9,8 +9,8 @@ CREATE TABLE Users (
 
 CREATE TABLE Reactions (
     user_id INTEGER NOT NULL ,
-    admirer_id INTEGER CHECK ( admirer_id != user_id ) NOT NULL,
-    reaction BOOLEAN NOT NULL,
+    target_id INTEGER CHECK ( target_id != user_id ) NOT NULL,
+    reaction INTEGER NOT NULL,
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, admirer_id)
+    PRIMARY KEY (user_id, target_id)
 );
