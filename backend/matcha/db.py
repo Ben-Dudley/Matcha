@@ -1,9 +1,11 @@
 import click
+import json
 
 from flask import current_app, g
 from flask.cli import with_appcontext
 
 from sqlalchemy import create_engine, text
+from werkzeug.security import generate_password_hash
 
 #from sqlalchemy_utils import functions
 
@@ -46,14 +48,36 @@ def init_db():
             conn.execute(query)
 
 
+def init_db_contents():
+    engine = get_engine()
+
+    with current_app.open_resource('data.json') as f:
+        data = json.loads(f.read().decode('utf-8'))
+        for user in data['users']:
+            engine.execute(
+                text('INSERT INTO Users (user_name, password) VALUES (:u, :p)'),
+                u=user['user_name'], p=generate_password_hash(user['password'])
+            )
+            click.echo(f'Created user {user["user_name"]}')
+
+
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
-    click.echo('Initialized the database.')
+    click.echo('Initialized the database')
+
+
+@click.command('init-db-contents')
+@with_appcontext
+def init_db_contents_command():
+    """Fill in data in fresh database"""
+    init_db_contents()
+    click.echo('Initialized the database contents')
 
 
 def init_app(app):
     app.teardown_appcontext(close_engine)
     app.cli.add_command(init_db_command)
+    app.cli.add_command(init_db_contents_command)
