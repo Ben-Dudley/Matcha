@@ -13,3 +13,5 @@ def get_user_id(user_name):
     if result is None:
         return None
     return result['user_id']
+
+# TODO create methods for user registration
