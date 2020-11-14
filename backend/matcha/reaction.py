@@ -16,7 +16,7 @@ class Reaction(Enum):
     CONNECTION = 4
 
     @classmethod
-    def get(cls, react):
+    def get_from_str(cls, react):
         for item in cls:
             if react == item.name.lower():
                 return item
@@ -45,112 +45,57 @@ def update_reaction(engine, user_id, target_id, react):
     )
 
 
-def get_reaction_list(engine, user_id, react):
-    result = engine.execute(
-        text('SELECT Users.user_name FROM Users JOIN Reactions '
-             'ON Users.user_id = Reactions.target_id '
-             'WHERE Reactions.user_id = :u AND Reactions.reaction = :r'),
-        u=user_id, r=react
-    ).fetchall()
-
-    users = []
-    for row in result:
-        users.append({"name": row['user_name']})
-
-    return users
-
-
 @bp.route('', methods=('GET', 'PUT'))
 def reaction():
+    content = request.json
+    user_name = content['user_name']
+    react = content['reaction']
+
+    app.logger.info(f'user_name - {user_name}')
+    app.logger.info(f'reaction - {react}')
+
+    user_id = db_methods.get_user_id(user_name)
+    react = Reaction.get_from_str(content['reaction'])
+    if user_id is None:
+        return f'user_name {user_name} not found', 400
+    if react is None:
+        return f'Reaction field is not valid', 400
+
+    engine = get_engine()
+
     if request.method == 'GET':
-
-        content = request.json
         entity = content['entity']
-        user_name = content['user_name']
-        react = content['reaction']
-
-        if not user_name:
-            return 'user_name is required', 400
-        if not entity:
-            return f'entity field is required', 400
-        if not react:
-            return f'reaction field is required', 400
-
-        app.logger.info(f'user_name - {user_name}')
         app.logger.info(f'entity - {entity}')
-        app.logger.info(f'reaction - {react}')
 
-        user_id = db_methods.get_user_id(user_name)
-        react = Reaction.get(content['reaction'])
-
-        if user_id is None:
-            return f'user_name {user_name} not found', 400
-        if react is None:
-            return f'reaction field is not valid', 400
-
-        engine = get_engine()
-
+        # User requests data about his view, likes, chat list
         if entity == 'user':
-            # User requests data about his view, likes, chat list
             result = engine.execute(
                 text('SELECT Users.user_name FROM Users JOIN Reactions ON Users.user_id = Reactions.target_id '
                      'WHERE Reactions.user_id = :u AND Reactions.reaction = :r'),
                 u=user_id, r=react.value
             ).fetchall()
-
-            users = []
-            for row in result:
-                users.append({"name": row['user_name']})
-
-            return {"users": users}, 200
+        # App requests data about views, likes and chat list for target user
         elif entity == 'target':
-            # Server requests data about views, likes and chat list for target user
             result = engine.execute(
                 text('SELECT Users.user_name FROM Users JOIN Reactions ON Users.user_id = Reactions.user_id '
                      'WHERE Reactions.target_id = :t AND Reactions.reaction = :r'),
                 t=user_id, r=react.value
             ).fetchall()
-
-            users = []
-            for row in result:
-                users.append({"name": row['user_name']})
-
-            return {"users": users}, 200
-        else:
-            return 'wrong entity', 400
         # TODO User requests data about block list
+        else:
+            return f'Entity {entity} is not valid', 400
+
+        users = []
+        for row in result:
+            users.append({"name": row['user_name']})
+        return {"users": users}, 200
     else:
-
-        content = request.json
-        user_name = content['user_name']
-        react = content['reaction']
         target_name = content['target_name']
-
-        if not user_name:
-            return 'user_name is required', 400
-        if not target_name:
-            return f'target_name field is required', 400
-        if not react:
-            return f'reaction field is required', 400
-
-        app.logger.info(f'user_name - {user_name}')
-        app.logger.info(f'reaction - {react}')
-
-        user_id = db_methods.get_user_id(user_name)
         target_id = db_methods.get_user_id(target_name)
-        react = Reaction.get(content['reaction'])
-
-        if user_id is None:
-            return f'user_name {user_name} not found', 400
         if target_id is None:
             return f'target_name {user_name} not found', 400
-        if react is None:
-            return f'reaction field is not valid', 400
-
-        engine = get_engine()
 
         if react == Reaction.VIEW:
-            # create entry with View
             engine.execute(
                 text('INSERT INTO Reactions (user_id, target_id, reaction, block) VALUES (:u, :t, :r, false)'),
                 u=user_id, t=target_id, r=Reaction.VIEW.value
@@ -165,20 +110,17 @@ def reaction():
                          'UPDATE Reactions SET reaction = :r WHERE user_id = :t AND target_id = :u'),
                     u=user_id, t=target_id, r=Reaction.CONNECTION.value
                 )
-                return 'Both user and target are upgraded to CONNECTION', 200
-            # Set user to Like
+                return 'Both user and target reactions are set to CONNECTION', 200
             update_reaction(engine, user_id, target_id, Reaction.LIKE.value)
-            return 'User upgraded to LIKE', 200
+            return 'User reaction is set to LIKE', 200
         elif react == Reaction.UNLIKE:
-            # set user to View
             update_reaction(engine, user_id, target_id, Reaction.VIEW.value)
             # check if target has connection
             db_reaction = get_reaction(engine, target_id, user_id)
             app.logger.info(f'db_reaction - {db_reaction}')
             if db_reaction is not None and db_reaction == Reaction.CONNECTION:
-                # set target to Like
                 update_reaction(engine, target_id, user_id, Reaction.LIKE.value)
-                return 'User downgraded to VIEW, target downgrade to LIKE', 200
-            return 'User downgraded to VIEW', 200
+                return 'User is reaction set to VIEW, target reaction is set to LIKE', 200
+            return 'User is reaction set to VIEW', 200
         else:
-            pass
+            return f'Reaction {react.name.tolower()} is not valid', 400
