@@ -21,7 +21,7 @@ def apicall(method, verb='POST', body=''):
     return f"Error:{response.status_code} {response.url} {response.content.decode('utf-8')}"
 
 # register users
-with open('data.json', encoding='utf-8') as f:
+with open('backend/matcha/data.json', encoding='utf-8') as f:
     data = json.loads(f.read())
     for user in data['users']:
         request_json = json.dumps(user)
