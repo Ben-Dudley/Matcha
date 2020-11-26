@@ -10,8 +10,7 @@ def get_user_id(user_name):
         u=user_name
     ).fetchone()
 
-    if result is None:
-        return None
-    return result['user_id']
+    if result is not None:
+        return result['user_id']
 
 # TODO create methods for user registration
