@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy import text
 
 from .db import get_engine
-from .db_methods import register_user
+from .db_methods import register_user, get_user_id
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -56,10 +56,7 @@ def register():
     engine = get_engine()
 
     # check if user already exists
-    result = engine.execute(
-        text('SELECT * FROM Users WHERE user_name = :u'),
-        u=user_name
-    )
+    result = get_user_id(engine, user_name)
     if request.method == 'POST':
         if result.fetchone() is not None:
             return 'User is already registered', 400
@@ -78,3 +75,42 @@ def register():
         return 'User does not exist', 200
     return 405
 
+
+@bp.route('/profile', methods=('PUT', 'GET'))
+def profile():
+    content = request.json
+    user_name = content['user_name']
+    app.logger.info(f'user_name - {user_name}')
+
+    engine = get_engine()
+
+    # check if user exists
+    user_id = get_user_id(engine, user_name)
+    if user_id is None:
+        return {'message': f'user_name {user_name} not found'}, 400
+
+    if request.method == 'GET':
+        result = engine.execute(
+            text('SELECT first_name, last_name, email, gender, preference, biography FROM Users WHERE user_id = :u'),
+            u=user_id
+        ).fetchone()
+
+        return dict(result), 200
+    else:
+        gender = content['gender']
+        preference = content['preference']
+        biography = content['biography']
+        interests = content['interests']
+
+        app.logger.info(f'gender - {gender}')
+        app.logger.info(f'preference - {preference}')
+        app.logger.info(f'biography - {biography}')
+        for item in interests:
+            app.logger.info(f'interests:')
+            app.logger.info(f'- {item}')
+
+        engine.execute(
+            text('UPDATE Users SET gender = :g, preference = :p, biography = :b WHERE user_id = :u'),
+            u=user_id, g=gender, p=preference, b=biography
+        )
+        return {'message': f'profile of {user_name} is updated'}, 200
