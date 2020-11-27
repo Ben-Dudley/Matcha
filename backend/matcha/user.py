@@ -105,12 +105,32 @@ def profile():
         app.logger.info(f'gender - {gender}')
         app.logger.info(f'preference - {preference}')
         app.logger.info(f'biography - {biography}')
+        app.logger.info(f'interests:')
         for item in interests:
-            app.logger.info(f'interests:')
             app.logger.info(f'- {item}')
 
+        # TODO need policy to clear unused tags
+
+        # construct list of ids for incoming data
+        interest_ids = []
+        for item in interests:
+            result = engine.execute(
+                text('SELECT interest_id FROM Interests WHERE name = :n'),
+                n=item
+            ).fetchone()
+            if result is None:
+                # add new entry
+                result = engine.execute(
+                    text('INSERT INTO Interests (name) VALUES (:n) RETURNING interest_id'),
+                    n=item
+                ).fetchone()
+                interest_ids.append(result["interest_id"])
+            else:
+                interest_ids.append(result['interest_id'])
+
         engine.execute(
-            text('UPDATE Users SET gender = :g, preference = :p, biography = :b WHERE user_id = :u'),
-            u=user_id, g=gender, p=preference, b=biography
+            text('UPDATE Users SET gender = :g, preference = :p, biography = :b, interests_list = :i '
+                 'WHERE user_id = :u'),
+            u=user_id, g=gender, p=preference, b=biography, i=sorted(interest_ids)
         )
         return {'message': f'profile of {user_name} is updated'}, 200
