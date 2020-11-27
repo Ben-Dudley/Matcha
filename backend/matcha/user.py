@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy import text
 
 from .db import get_engine
+from .db_methods import register_user
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -37,9 +38,15 @@ def register():
     content = request.json
     user_name = content['user_name']
     password = content['password']
+    email = content['email']
+    last_name = content['last_name']
+    first_name = content['first_name']
 
     app.logger.info(f'user_name - {user_name}')
     app.logger.info(f'password - {password}')
+    app.logger.info(f'first_name - {first_name}')
+    app.logger.info(f'last_name - {last_name}')
+    app.logger.info(f'email - {email}')
 
     if not user_name:
         return 'user_name is required', 400
@@ -48,6 +55,7 @@ def register():
 
     engine = get_engine()
 
+    # check if user already exists
     result = engine.execute(
         text('SELECT * FROM Users WHERE user_name = :u'),
         u=user_name
@@ -56,10 +64,7 @@ def register():
         if result.fetchone() is not None:
             return 'User is already registered', 400
 
-        engine.execute(
-            text('INSERT INTO Users (user_name, password) VALUES (:u, :p)'),
-            u=user_name, p=generate_password_hash(password)
-        )
+        register_user(engine, user_name, password, first_name, last_name, email)
         return 'User registered successfully', 201
     elif request.method == 'DELETE':
         user = result.fetchone()

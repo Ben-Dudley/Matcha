@@ -2,15 +2,31 @@
     "users" : [
         {
             "user_name": "root",
-            "password": "pass"
+            "password": "pass",
+            "first_name": "root",
+            "last_name": "sudo",
+            "email": "root@gmail.com"
         },
         {
-            "user_name": "kamil",
-            "password": "aliev"
+            "user_name": "kam",
+            "password": "pasw",
+            "first_name": "kamil",
+            "last_name": "aliev",
+            "email": "aliev@gmail.com"
         },
         {
-            "user_name": "sveva",
-            "password": "mazzari"
+            "user_name": "sve",
+            "password": "paso",
+            "first_name": "sveva",
+            "last_name": "mazzari",
+            "email": "mazzari@gmail.com"
+        },
+        {
+            "user_name": "vile",
+            "password": "psss",
+            "first_name": "vilena",
+            "last_name": "guslyakova",
+            "email": "guslyakova@gmail.com"
         }
     ]
 }
