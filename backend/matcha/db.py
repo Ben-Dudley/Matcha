@@ -5,7 +5,8 @@ from flask import current_app, g
 from flask.cli import with_appcontext
 
 from sqlalchemy import create_engine, text
-from werkzeug.security import generate_password_hash
+
+from .db_methods import register_user
 
 #from sqlalchemy_utils import functions
 
@@ -54,10 +55,8 @@ def init_db_contents():
     with current_app.open_resource('data.json') as f:
         data = json.loads(f.read().decode('utf-8'))
         for user in data['users']:
-            engine.execute(
-                text('INSERT INTO Users (user_name, password) VALUES (:u, :p)'),
-                u=user['user_name'], p=generate_password_hash(user['password'])
-            )
+            register_user(engine, user['user_name'], user['password'], user['first_name'], user['last_name'],
+                          user['email'])
             click.echo(f'Created user {user["user_name"]}')
 
 

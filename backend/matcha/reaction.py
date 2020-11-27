@@ -54,14 +54,14 @@ def reaction():
     app.logger.info(f'user_name - {user_name}')
     app.logger.info(f'reaction - {react}')
 
-    user_id = db_methods.get_user_id(user_name)
+    engine = get_engine()
+
+    user_id = db_methods.get_user_id(engine, user_name)
     react = Reaction.get_from_str(content['reaction'])
     if user_id is None:
         return f'user_name {user_name} not found', 400
     if react is None:
         return f'Reaction field is not valid', 400
-
-    engine = get_engine()
 
     if request.method == 'GET':
         entity = content['entity']
@@ -91,7 +91,7 @@ def reaction():
         return {"users": users}, 200
     else:
         target_name = content['target_name']
-        target_id = db_methods.get_user_id(target_name)
+        target_id = db_methods.get_user_id(engine, target_name)
         if target_id is None:
             return f'target_name {user_name} not found', 400
 
