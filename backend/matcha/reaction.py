@@ -59,9 +59,9 @@ def reaction():
     user_id = db_methods.get_user_id(engine, user_name)
     react = Reaction.get_from_str(content['reaction'])
     if user_id is None:
-        return f'user_name {user_name} not found', 400
+        return {'message': f'user_name {user_name} not found'}, 400
     if react is None:
-        return f'Reaction field is not valid', 400
+        return {'message': 'Reaction field is not valid'}, 400
 
     if request.method == 'GET':
         entity = content['entity']
@@ -83,24 +83,24 @@ def reaction():
             ).fetchall()
         # TODO User requests data about block list
         else:
-            return f'Entity {entity} is not valid', 400
+            return {'message': f'Entity {entity} is not valid'}, 400
 
         users = []
         for row in result:
             users.append({"name": row['user_name']})
-        return {"users": users}, 200
+        return {'content': {'users': users}}, 200
     else:
         target_name = content['target_name']
         target_id = db_methods.get_user_id(engine, target_name)
         if target_id is None:
-            return f'target_name {user_name} not found', 400
+            return {'message': f'target_name {user_name} not found'}, 400
 
         if react == Reaction.VIEW:
             engine.execute(
                 text('INSERT INTO Reactions (user_id, target_id, reaction, block) VALUES (:u, :t, :r, false)'),
                 u=user_id, t=target_id, r=Reaction.VIEW.value
             )
-            return 'Reaction entry is created', 201
+            return {'message': 'Reaction entry is created'}, 201
         elif react == Reaction.LIKE:
             # check if target likes back
             db_reaction = get_reaction(engine, target_id, user_id)
@@ -110,9 +110,9 @@ def reaction():
                          'UPDATE Reactions SET reaction = :r WHERE user_id = :t AND target_id = :u'),
                     u=user_id, t=target_id, r=Reaction.CONNECTION.value
                 )
-                return 'Both user and target reactions are set to CONNECTION', 200
+                return {'message': 'Both user and target reactions are set to CONNECTION'}, 200
             update_reaction(engine, user_id, target_id, Reaction.LIKE.value)
-            return 'User reaction is set to LIKE', 200
+            return {'message': 'User reaction is set to LIKE'}, 200
         elif react == Reaction.UNLIKE:
             update_reaction(engine, user_id, target_id, Reaction.VIEW.value)
             # check if target has connection
@@ -121,6 +121,6 @@ def reaction():
             if db_reaction is not None and db_reaction == Reaction.CONNECTION:
                 update_reaction(engine, target_id, user_id, Reaction.LIKE.value)
                 return 'User is reaction set to VIEW, target reaction is set to LIKE', 200
-            return 'User is reaction set to VIEW', 200
+            return {'message': 'User is reaction set to VIEW'}, 200
         else:
-            return f'Reaction {react.name.tolower()} is not valid', 400
+            return {'message': f'Reaction {react.name.tolower()} is not valid'}, 400

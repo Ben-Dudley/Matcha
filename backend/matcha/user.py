@@ -1,9 +1,9 @@
 from flask import Blueprint, request, current_app as app
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 from sqlalchemy import text
 
 from .db import get_engine
-from .db_methods import register_user
+from .db_methods import register_user, get_user_id
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -25,11 +25,11 @@ def login():
         ).fetchone()
 
         if user is None:
-            return 'Incorrect user_name', 400
+            return {'message': 'Incorrect user_name'}, 400
         elif not check_password_hash(user['password'], password):
-            return 'Incorrect password', 400
+            return {'message': 'Incorrect password'}, 400
 
-        return 'Successful login', 200
+        return {'message': 'Successful login'}, 200
     return 405
 
 
@@ -49,32 +49,88 @@ def register():
     app.logger.info(f'email - {email}')
 
     if not user_name:
-        return 'user_name is required', 400
+        return {'message': 'user_name is required'}, 400
     elif not password:
-        return 'password is required', 400
+        return {'message': 'password is required'}, 400
 
     engine = get_engine()
 
     # check if user already exists
-    result = engine.execute(
-        text('SELECT * FROM Users WHERE user_name = :u'),
-        u=user_name
-    )
+    result = get_user_id(engine, user_name)
     if request.method == 'POST':
         if result.fetchone() is not None:
             return 'User is already registered', 400
 
         register_user(engine, user_name, password, first_name, last_name, email)
-        return 'User registered successfully', 201
+        return {'message': 'User registered successfully'}, 201
     elif request.method == 'DELETE':
         user = result.fetchone()
         if user is not None:
             if not check_password_hash(user['password'], password):
-                return 'Incorrect password', 400
+                return {'message': 'Incorrect password'}, 400
             engine.execute(
                 text('DELETE FROM Users WHERE user_name = :u'),
                 u=user_name
             )
-        return 'User does not exist', 200
+        return {'message': 'User does not exist'}, 200
     return 405
 
+
+@bp.route('/profile', methods=('PUT', 'GET'))
+def profile():
+    content = request.json
+    user_name = content['user_name']
+    app.logger.info(f'user_name - {user_name}')
+
+    engine = get_engine()
+
+    # check if user exists
+    user_id = get_user_id(engine, user_name)
+    if user_id is None:
+        return {'message': f'user_name {user_name} not found'}, 400
+
+    if request.method == 'GET':
+        result = engine.execute(
+            text('SELECT first_name, last_name, email, gender, preference, biography FROM Users WHERE user_id = :u'),
+            u=user_id
+        ).fetchone()
+
+        return dict(result), 200
+    else:
+        gender = content['gender']
+        preference = content['preference']
+        biography = content['biography']
+        interests = content['interests']
+
+        app.logger.info(f'gender - {gender}')
+        app.logger.info(f'preference - {preference}')
+        app.logger.info(f'biography - {biography}')
+        app.logger.info(f'interests:')
+        for item in interests:
+            app.logger.info(f'- {item}')
+
+        # TODO need policy to clear unused tags
+
+        # construct list of ids for incoming data
+        interest_ids = []
+        for item in interests:
+            result = engine.execute(
+                text('SELECT interest_id FROM Interests WHERE name = :n'),
+                n=item
+            ).fetchone()
+            if result is None:
+                # add new entry
+                result = engine.execute(
+                    text('INSERT INTO Interests (name) VALUES (:n) RETURNING interest_id'),
+                    n=item
+                ).fetchone()
+                interest_ids.append(result["interest_id"])
+            else:
+                interest_ids.append(result['interest_id'])
+
+        engine.execute(
+            text('UPDATE Users SET gender = :g, preference = :p, biography = :b, interests_list = :i '
+                 'WHERE user_id = :u'),
+            u=user_id, g=gender, p=preference, b=biography, i=sorted(interest_ids)
+        )
+        return {'message': f'profile of {user_name} is updated'}, 200
