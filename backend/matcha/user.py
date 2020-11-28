@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash
 from sqlalchemy import text
 
 from .db import get_engine
-from .db_methods import register_user, get_user_id
+from .db_methods import register_user, get_user_id, update_profile
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -94,8 +94,16 @@ def profile():
             text('SELECT first_name, last_name, email, gender, preference, biography FROM Users WHERE user_id = :u'),
             u=user_id
         ).fetchone()
+        user_profile = {"user": dict(result)}
 
-        return dict(result), 200
+        result = engine.execute(
+            text('SELECT I.name FROM Interests I JOIN UserInterestRelation R ON R.interest_id = I.interest_id '
+                 'JOIN Users U on R.user_id = U.user_id WHERE U.user_id = :u'),
+            u=user_id
+        ).fetchall()
+
+        user_profile["user"]["interests"] = [r["name"] for r in result]
+        return {user_profile}, 200
     else:
         gender = content['gender']
         preference = content['preference']
@@ -109,28 +117,5 @@ def profile():
         for item in interests:
             app.logger.info(f'- {item}')
 
-        # TODO need policy to clear unused tags
-
-        # construct list of ids for incoming data
-        interest_ids = []
-        for item in interests:
-            result = engine.execute(
-                text('SELECT interest_id FROM Interests WHERE name = :n'),
-                n=item
-            ).fetchone()
-            if result is None:
-                # add new entry
-                result = engine.execute(
-                    text('INSERT INTO Interests (name) VALUES (:n) RETURNING interest_id'),
-                    n=item
-                ).fetchone()
-                interest_ids.append(result["interest_id"])
-            else:
-                interest_ids.append(result['interest_id'])
-
-        engine.execute(
-            text('UPDATE Users SET gender = :g, preference = :p, biography = :b, interests_list = :i '
-                 'WHERE user_id = :u'),
-            u=user_id, g=gender, p=preference, b=biography, i=sorted(interest_ids)
-        )
+        update_profile(engine, user_id, gender, preference, biography, interests)
         return {'message': f'profile of {user_name} is updated'}, 200

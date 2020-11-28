@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS UserInterestRelation;
 DROP TABLE IF EXISTS Interests;
 DROP TABLE IF EXISTS Reactions;
 DROP TABLE IF EXISTS Users;
@@ -11,8 +12,7 @@ CREATE TABLE Users (
   email TEXT NOT NULL,
   gender BOOLEAN,
   preference BOOLEAN,
-  biography TEXT,
-  interests_list INTEGER[]
+  biography TEXT
 );
 
 CREATE TABLE Reactions (
@@ -27,5 +27,12 @@ CREATE TABLE Reactions (
 
 CREATE TABLE Interests (
     interest_id SERIAL PRIMARY KEY,
-    name CHAR(32) NOT NULL
+    name TEXT NOT NULL
 );
+
+CREATE TABLE UserInterestRelation (
+    user_id INTEGER NOT NULL,
+    interest_id INTEGER NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, interest_id)
+)

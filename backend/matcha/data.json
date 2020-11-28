@@ -5,28 +5,52 @@
             "password": "pass",
             "first_name": "root",
             "last_name": "sudo",
-            "email": "root@gmail.com"
+            "email": "root@gmail.com",
+            "gender": null,
+            "preference": null,
+            "biography": "I'm the root, what you want?",
+            "interests": [
+                "kernel", "programming"
+            ]
         },
         {
             "user_name": "kam",
             "password": "pasw",
             "first_name": "kamil",
             "last_name": "aliev",
-            "email": "aliev@gmail.com"
+            "email": "aliev@gmail.com",
+            "gender": true,
+            "preference": false,
+            "biography": "really don't feel like being a product owner",
+            "interests": [
+                "sushi", "programming", "mac"
+            ]
         },
         {
             "user_name": "sve",
             "password": "paso",
             "first_name": "sveva",
             "last_name": "mazzari",
-            "email": "mazzari@gmail.com"
+            "email": "mazzari@gmail.com",
+            "gender": false,
+            "preference": true,
+            "biography": "You are wrong",
+            "interests": [
+                "sushi", "kamil"
+            ]
         },
         {
             "user_name": "vile",
             "password": "psss",
             "first_name": "vilena",
             "last_name": "guslyakova",
-            "email": "guslyakova@gmail.com"
+            "email": "guslyakova@gmail.com",
+            "gender": false,
+            "preference": true,
+            "biography": "You dont know, but Im working",
+            "interests": [
+                "sushi", "programming", "smthelse"
+            ]
         }
     ]
 }
