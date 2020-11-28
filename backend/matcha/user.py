@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app as app
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 from sqlalchemy import text
 
 from .db import get_engine
@@ -25,11 +25,11 @@ def login():
         ).fetchone()
 
         if user is None:
-            return 'Incorrect user_name', 400
+            return {'message': 'Incorrect user_name'}, 400
         elif not check_password_hash(user['password'], password):
-            return 'Incorrect password', 400
+            return {'message': 'Incorrect password'}, 400
 
-        return 'Successful login', 200
+        return {'message': 'Successful login'}, 200
     return 405
 
 
@@ -49,9 +49,9 @@ def register():
     app.logger.info(f'email - {email}')
 
     if not user_name:
-        return 'user_name is required', 400
+        return {'message': 'user_name is required'}, 400
     elif not password:
-        return 'password is required', 400
+        return {'message': 'password is required'}, 400
 
     engine = get_engine()
 
@@ -62,17 +62,17 @@ def register():
             return 'User is already registered', 400
 
         register_user(engine, user_name, password, first_name, last_name, email)
-        return 'User registered successfully', 201
+        return {'message': 'User registered successfully'}, 201
     elif request.method == 'DELETE':
         user = result.fetchone()
         if user is not None:
             if not check_password_hash(user['password'], password):
-                return 'Incorrect password', 400
+                return {'message': 'Incorrect password'}, 400
             engine.execute(
                 text('DELETE FROM Users WHERE user_name = :u'),
                 u=user_name
             )
-        return 'User does not exist', 200
+        return {'message': 'User does not exist'}, 200
     return 405
 
 

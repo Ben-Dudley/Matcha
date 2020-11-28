@@ -13,11 +13,12 @@ def block_list():
 
     user_name = content['user_name']
     app.logger.info(f'user_name - {user_name}')
-    user_id = db_methods.get_user_id(user_name)
-    if user_id is None:
-        return f'user_name {user_name} not found', 400
 
     engine = get_engine()
+
+    user_id = db_methods.get_user_id(engine, user_name)
+    if user_id is None:
+        return {'message': f'user_name {user_name} not found'}, 400
 
     # get list of blocked users
     if request.method == 'GET':
@@ -29,7 +30,7 @@ def block_list():
         users = []
         for row in result:
             users.append({"name": row['user_name']})
-        return {"users": users}, 200
+        return {'content': {'users': users}}, 200
     # update block list
     else:
         target_name = content['target_name']
@@ -37,9 +38,9 @@ def block_list():
         app.logger.info(f'target_name - {target_name}')
         app.logger.info(f'block - {block}')
 
-        target_id = db_methods.get_user_id(target_name)
+        target_id = db_methods.get_user_id(engine, target_name)
         if target_id is None:
-            return f'target_name {target_name} not found', 400
+            return {'message': f'target_name {target_name} not found'}, 400
 
         result = engine.execute(
             text('SELECT target_id FROM Reactions WHERE user_id = :u AND target_id = :t'),
@@ -51,4 +52,4 @@ def block_list():
             text('UPDATE Reactions SET block = :b WHERE user_id = :u AND target_id = :t'),
             u=user_id, t=target_id, b=block
         )
-        return f'Block value is updated'
+        return {'message': 'Block value is updated'}
