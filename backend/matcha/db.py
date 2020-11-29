@@ -6,7 +6,7 @@ from flask.cli import with_appcontext
 
 from sqlalchemy import create_engine, text
 
-from .db_methods import register_user
+from .db_methods import register_user, get_user_id, update_profile
 
 #from sqlalchemy_utils import functions
 
@@ -55,9 +55,14 @@ def init_db_contents():
     with current_app.open_resource('data.json') as f:
         data = json.loads(f.read().decode('utf-8'))
         for user in data['users']:
-            register_user(engine, user['user_name'], user['password'], user['first_name'], user['last_name'],
-                          user['email'])
+            register_user(engine, user['user_name'], user['password'],
+                          user['first_name'], user['last_name'], user['email'])
             click.echo(f'Created user {user["user_name"]}')
+
+            # TODO think of better way to avoid extra method call
+            user_id = get_user_id(engine, user['user_name'])
+            update_profile(engine, user_id, user['gender'], user['preference'], user['biography'], user['interests'])
+            click.echo(f'User {user["user_name"]} profile updated')
 
 
 @click.command('init-db')

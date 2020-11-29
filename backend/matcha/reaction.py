@@ -88,7 +88,7 @@ def reaction():
         users = []
         for row in result:
             users.append({"name": row['user_name']})
-        return {'content': {'users': users}}, 200
+        return {'users': users}, 200
     else:
         target_name = content['target_name']
         target_id = db_methods.get_user_id(engine, target_name)
