@@ -20,7 +20,7 @@ def login():
         engine = get_engine()
 
         user = engine.execute(
-            text('SELECT * FROM Users WHERE user_name = :u'),
+            text('SELECT password FROM Users WHERE user_name = :u'),
             u=user_name
         ).fetchone()
 
@@ -64,6 +64,7 @@ def register():
         register_user(engine, user_name, password, first_name, last_name, email)
         return {'message': 'User registered successfully'}, 201
     elif request.method == 'DELETE':
+        # TODO remove user's picture directory
         user = result.fetchone()
         if user is not None:
             if not check_password_hash(user['password'], password):

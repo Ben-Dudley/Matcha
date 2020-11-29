@@ -16,7 +16,9 @@ def create_app(test_config=None):
     }
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=URL(**database)
+        DATABASE=URL(**database),
+        UPLOAD_FOLDER=os.path.join(app.instance_path, 'uploads'),
+        ALLOWED_EXTENSIONS={'png', 'jpg', 'jpeg'}
     )
 
     if test_config is None:
@@ -48,5 +50,8 @@ def create_app(test_config=None):
 
     from . import block
     app.register_blueprint(block.bp)
+
+    from . import upload
+    app.register_blueprint(upload.bp)
 
     return app
