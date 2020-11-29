@@ -28,7 +28,7 @@ def get_engine():
             current_app.config['DATABASE'],
             isolation_level='AUTOCOMMIT',
             client_encoding='utf8',
-            echo=True)
+            echo=False)
 
     return g.engine
 

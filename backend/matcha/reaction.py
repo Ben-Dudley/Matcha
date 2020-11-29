@@ -87,7 +87,7 @@ def reaction():
 
         users = []
         for row in result:
-            users.append({"name": row['user_name']})
+            users.append({'name': row['user_name']})
         return {'users': users}, 200
     else:
         target_name = content['target_name']

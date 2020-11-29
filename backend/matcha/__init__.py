@@ -49,4 +49,7 @@ def create_app(test_config=None):
     from . import block
     app.register_blueprint(block.bp)
 
+    from . import search
+    app.register_blueprint(search.bp)
+
     return app
